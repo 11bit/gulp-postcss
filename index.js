@@ -20,7 +20,7 @@ module.exports = function (processors, options) {
     }
 
     // Source map is disabled by default
-    var opts = { map: false }
+    var opts = { map: false, failOnError: true }
     var attr
 
     // Extend default options
@@ -78,7 +78,13 @@ module.exports = function (processors, options) {
       // Prevent stream’s unhandled exception from
       // being suppressed by Promise
       setImmediate(function () {
-        cb(new gutil.PluginError('gulp-postcss', error))
+        if (opts.failOnError) {
+          cb(new gutil.PluginError('gulp-postcss', error))
+        } else {
+          gutil.log('gulp-postcss:', gutil.colors.red('✖ Css Syntax Error'))
+          gutil.log(error)
+          cb(null, file)
+        }
       })
     }
 
